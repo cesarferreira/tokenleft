@@ -39,7 +39,7 @@ pub fn render(providers: &[Provider], now: i64) -> String {
 
 fn row(r: &Row, now: i64) -> String {
     let pct = r.used_pct.unwrap_or(0.0).clamp(0.0, 100.0);
-    let bar = bar(pct, WIDTH, "━", "━");
+    let bar = bar(pct, WIDTH, "━", "─");
     let mut tail = format!("{pct:>3.0}% used");
     if let Some(d) = &r.detail {
         tail = format!("{d}  ({tail})");
@@ -121,7 +121,7 @@ pub fn summary(providers: &[Provider]) -> String {
                 let detail = r.detail.as_deref().unwrap_or("");
                 out.push_str(&format!(
                     "{}  {detail:<detail_w$}  {pct:>3.0}%",
-                    bar(pct, 20, "━", "━")
+                    bar(pct, 20, "━", "─")
                 ));
             }
             None => out.push_str("\x1b[31merror\x1b[0m"),
