@@ -173,6 +173,31 @@ fn ago(secs: i64) -> String {
     }
 }
 
+/// Visible width of a line, ignoring ANSI colour escapes.
+fn visible_width(line: &str) -> usize {
+    let mut n = 0;
+    let mut in_esc = false;
+    for c in line.chars() {
+        match (in_esc, c) {
+            (false, '\x1b') => in_esc = true,
+            (true, 'm') => in_esc = false,
+            (false, _) => n += 1,
+            _ => {}
+        }
+    }
+    n
+}
+
+/// Centre a block of text in a `cols` x `rows` terminal.
+pub fn center(text: &str, cols: usize, rows: usize) -> String {
+    let lines: Vec<&str> = text.lines().collect();
+    let width = lines.iter().map(|l| visible_width(l)).max().unwrap_or(0);
+    let left = " ".repeat(cols.saturating_sub(width) / 2);
+    let top = "\n".repeat(rows.saturating_sub(lines.len()) / 2);
+    let body: Vec<String> = lines.iter().map(|l| format!("{left}{l}")).collect();
+    format!("{top}{}\n", body.join("\n"))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -242,5 +267,11 @@ mod tests {
     fn rings_glyph_tracks_usage() {
         let ps = [provider("A", vec![row("m", 100.0, None)], None)];
         assert!(rings(&ps).contains('●'));
+    }
+
+    #[test]
+    fn center_pads_by_visible_width() {
+        let out = center("\x1b[34mab\x1b[0m\nabcd", 10, 5);
+        assert_eq!(out, "\n   \x1b[34mab\x1b[0m\n   abcd\n");
     }
 }

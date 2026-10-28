@@ -38,6 +38,10 @@ struct Cli {
     #[arg(short, long)]
     refresh: bool,
 
+    /// Centre the output in the terminal
+    #[arg(short, long)]
+    center: bool,
+
     /// Only show these providers (claude, codex, cursor)
     #[arg(short, long, value_delimiter = ',')]
     only: Vec<String>,
@@ -155,12 +159,18 @@ fn main() -> Result<()> {
             if cli.watch.is_some() {
                 print!("\x1b[2J\x1b[H");
             }
-            match format {
-                Format::Bars => print!("{}", render::compact(&providers)),
-                Format::Summary => print!("{}", render::summary(&providers)),
-                Format::Rings => print!("{}", render::rings(&providers)),
-                Format::Plain => print!("{}", render::plain(&providers)),
-                _ => print!("{}", render::render(&providers, now)),
+            let out = match format {
+                Format::Bars => render::compact(&providers),
+                Format::Summary => render::summary(&providers),
+                Format::Rings => render::rings(&providers),
+                Format::Plain => render::plain(&providers),
+                _ => render::render(&providers, now),
+            };
+            match terminal_size::terminal_size() {
+                Some((w, h)) if cli.center => {
+                    print!("{}", render::center(&out, w.0 as usize, h.0 as usize))
+                }
+                _ => print!("{out}"),
             }
         }
         match cli.watch {

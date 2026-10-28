@@ -68,6 +68,7 @@ tokenleft --watch            # refresh every 120s (or --watch 30)
 tokenleft --refresh          # skip the cache
 tokenleft --ttl 60           # cache lifetime in seconds (default 300, 0 = off)
 tokenleft --only claude,cursor
+tokenleft --center           # centre the output in the terminal (handy in a small pane)
 tokenleft --format summary   # 3 lines: bar, money used, percent used
 tokenleft --format bars      # one compact bar per provider
 tokenleft --format rings     # one line of ◔ ◑ ◕ circles
@@ -161,7 +162,7 @@ tokenleft --watch 300 --format summary          # live, refresh every 5 minutes
 
 ### Rex
 
-Add to `~/.config/rex/init.lua`. The shortcut opens a small usage popup centered in the window, and pressing it again closes it:
+Add to `~/.config/rex/init.lua`. The shortcut opens a slim usage strip above the focused pane with the output centered, and pressing it again closes it:
 
 ```lua
 rex.action{
@@ -174,13 +175,21 @@ rex.action{
         return
       end
     end
-    rex.session.new_layer{
-      bounds = { 0.3, 0.45, 0.4, 0.1 },
+    local made = rex.session.new_split{
+      direction = "vertical",
+      side      = "before",
       layout    = rex.layout.block{
         flavor  = "com.superlogical.terminal.shell",
         label   = "tokenleft",
-        options = { command = { "tokenleft", "--watch", "--format", "summary" }, exit = { on_completion = false } },
+        options = { command = { "tokenleft", "--watch", "--format", "summary", "--center" }, exit = { on_completion = false } },
       },
+    }
+    rex.sleep(0.2)  -- new_split ignores ratio, so size the strip afterwards
+    rex.session.resize_pane{
+      direction       = "vertical",
+      before_block_id = made.block_ids[1],
+      after_block_id  = made.anchor_id,
+      ratio           = 0.1,
     }
   end,
 }
