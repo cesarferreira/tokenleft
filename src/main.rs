@@ -149,15 +149,45 @@ fn label(n: &str) -> &'static str {
 
 /// Terminal size in (cols, rows), when stdout is a terminal.
 fn term_size() -> Option<(usize, usize)> {
-    terminal_size::terminal_size().map(|(w, h)| (w.0 as usize, h.0 as usize))
+    terminal_size::terminal_size()
+        .map(|(w, h)| (w.0 as usize, h.0 as usize))
+        // A pty that has not been sized yet reports 0x0.
+        .filter(|&(cols, rows)| cols > 0 && rows > 0)
+}
+
+/// Terminal size to lay out the first frame for. A freshly spawned pane starts at a
+/// default (80x24) or zero size and is resized right after, so drawing at once
+/// would centre for the wrong size and then jump. While the size still looks like
+/// that default, wait for the resize; a real size is used immediately.
+fn settled_term_size() -> Option<(usize, usize)> {
+    let start = std::time::Instant::now();
+    let initial = term_size();
+    if initial.is_some() && initial != Some((80, 24)) {
+        return initial;
+    }
+    while start.elapsed() < Duration::from_millis(1000) {
+        if !std::io::IsTerminal::is_terminal(&std::io::stdout()) {
+            return None;
+        }
+        std::thread::sleep(Duration::from_millis(5));
+        let now = term_size();
+        if now.is_some() && now != initial {
+            return now;
+        }
+    }
+    initial
 }
 
 /// Print `out`, centred when asked, and return the terminal size it was laid out for.
-fn draw(cli: &Cli, out: &str) -> Option<(usize, usize)> {
+fn draw(cli: &Cli, out: &str, first: bool) -> Option<(usize, usize)> {
     if cli.watch.is_some() {
         print!("\x1b[2J\x1b[H");
     }
-    let size = term_size();
+    let size = if cli.center && first {
+        settled_term_size()
+    } else {
+        term_size()
+    };
     match size {
         Some((cols, rows)) if cli.center => print!("{}", render::center(out, cols, rows)),
         _ => print!("{out}"),
@@ -168,6 +198,7 @@ fn draw(cli: &Cli, out: &str) -> Option<(usize, usize)> {
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
+    let mut first = true;
     loop {
         let now = chrono::Utc::now().timestamp();
         let providers = collect(&cli, now);
@@ -184,16 +215,17 @@ fn main() -> Result<()> {
                 Format::Plain => render::plain(&providers),
                 _ => render::render(&providers, now),
             };
-            size = draw(&cli, &out);
+            size = draw(&cli, &out, first);
+            first = false;
         }
         let Some(secs) = cli.watch else { return Ok(()) };
         // Sleep in short steps so a centred view follows the pane when it is resized.
         let wake = std::time::Instant::now() + Duration::from_secs(secs.max(10));
         while std::time::Instant::now() < wake {
-            std::thread::sleep(Duration::from_millis(200));
+            std::thread::sleep(Duration::from_millis(25));
             let now_size = term_size();
             if cli.center && format != Format::Json && now_size != size {
-                size = draw(&cli, &out);
+                size = draw(&cli, &out, false);
             }
         }
     }
