@@ -97,10 +97,11 @@ pub fn fetch() -> Result<Provider> {
         other => crate::claude_title(other),
     });
     Ok(Provider {
-        name: "Codex",
+        name: "Codex".into(),
         plan,
         rows,
         error: None,
+        fetched_at: 0,
     })
 }
 

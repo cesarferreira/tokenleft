@@ -20,6 +20,12 @@ pub fn render(providers: &[Provider], now: i64) -> String {
         if let Some(plan) = &p.plan {
             out.push_str(&format!("  \x1b[2m{plan}\x1b[0m"));
         }
+        if p.fetched_at > 0 {
+            out.push_str(&format!(
+                "  \x1b[2m· updated {}\x1b[0m",
+                ago(now - p.fetched_at)
+            ));
+        }
         out.push('\n');
         if let Some(err) = &p.error {
             out.push_str(&format!("  \x1b[31m{err}\x1b[0m\n"));
@@ -85,4 +91,12 @@ pub fn compact(providers: &[Provider]) -> String {
         out.push('\n');
     }
     out
+}
+
+fn ago(secs: i64) -> String {
+    match secs {
+        s if s < 60 => "just now".into(),
+        s if s < 3600 => format!("{}m ago", s / 60),
+        s => format!("{}h ago", s / 3600),
+    }
 }

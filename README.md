@@ -67,12 +67,14 @@ make build-release
 ```bash
 agent-usage                    # one-shot bars for Claude, Codex, Cursor
 agent-usage --watch            # refresh every 120s (or --watch 30)
+agent-usage --refresh          # skip the cache
+agent-usage --ttl 60           # cache lifetime in seconds (default 300, 0 = off)
 agent-usage --only claude,cursor
 agent-usage --format bars      # one compact line per provider
 agent-usage --format json     # machine-readable (--json also works)
 ```
 
-macOS only. It reads local credentials and calls unofficial endpoints, so it can break without notice:
+Results are cached for 5 minutes in `~/Library/Caches/agent-usage/cache.json`, and the last good data is shown if a refresh fails. macOS only. It reads local credentials and calls unofficial endpoints, so it can break without notice:
 
 | Agent | Credentials | Source |
 | --- | --- | --- |

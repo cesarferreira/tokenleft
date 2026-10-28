@@ -1,6 +1,6 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Row {
     pub label: String,
     pub used_pct: Option<f64>,
@@ -8,21 +8,25 @@ pub struct Row {
     pub resets_at: Option<i64>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Provider {
-    pub name: &'static str,
+    pub name: String,
     pub plan: Option<String>,
     pub rows: Vec<Row>,
     pub error: Option<String>,
+    /// Unix time the data was fetched; 0 when unknown.
+    #[serde(default)]
+    pub fetched_at: i64,
 }
 
 impl Provider {
-    pub fn failed(name: &'static str, err: anyhow::Error) -> Self {
+    pub fn failed(name: &str, err: anyhow::Error) -> Self {
         Self {
-            name,
+            name: name.into(),
             plan: None,
             rows: Vec::new(),
             error: Some(format!("{err:#}")),
+            fetched_at: 0,
         }
     }
 }

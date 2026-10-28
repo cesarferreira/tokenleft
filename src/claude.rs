@@ -58,10 +58,11 @@ pub fn fetch() -> Result<Provider> {
     }
 
     Ok(Provider {
-        name: "Claude",
+        name: "Claude".into(),
         plan,
         rows,
         error: None,
+        fetched_at: 0,
     })
 }
 

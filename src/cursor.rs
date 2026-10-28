@@ -37,10 +37,11 @@ pub fn fetch() -> Result<Provider> {
     }
 
     Ok(Provider {
-        name: "Cursor",
+        name: "Cursor".into(),
         plan: usage["membershipType"].as_str().map(crate::claude_title),
         rows,
         error: None,
+        fetched_at: 0,
     })
 }
 
