@@ -49,8 +49,8 @@ run:
 
 # Quick demo
 demo: install
-	@echo "=== agent-usage demo ==="
-	agent-usage --help
+	@echo "=== tokenleft demo ==="
+	tokenleft --help
 
 # Bump version, regenerate CHANGELOG.md, tag, publish, and push (requires cargo-release + git-cliff)
 release:

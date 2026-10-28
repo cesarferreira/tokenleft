@@ -13,7 +13,7 @@ use std::time::Duration;
 
 #[derive(Parser, Debug)]
 #[command(
-    name = "agent-usage",
+    name = "tokenleft",
     version,
     about = "Show remaining Claude, Codex and Cursor usage"
 )]

@@ -28,7 +28,7 @@ pub fn fetch() -> Result<Provider> {
     });
 
     let init = json!({"jsonrpc":"2.0","id":1,"method":"initialize",
-        "params":{"clientInfo":{"name":"agent-usage","version":env!("CARGO_PKG_VERSION")}}});
+        "params":{"clientInfo":{"name":"tokenleft","version":env!("CARGO_PKG_VERSION")}}});
     let initialized = json!({"jsonrpc":"2.0","method":"initialized"});
     let read = json!({"jsonrpc":"2.0","id":2,"method":"account/rateLimits/read"});
     for msg in [init, initialized, read] {

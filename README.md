@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>agent-usage</h1>
+  <h1>tokenleft</h1>
 
   <p><strong>Show remaining Claude, Codex and Cursor usage</strong></p>
 
@@ -7,7 +7,7 @@
     <img alt="License" src="https://img.shields.io/badge/license-MIT-green">
     <img alt="Rust" src="https://img.shields.io/badge/rust-1.85%2B-orange">
     <img alt="Edition" src="https://img.shields.io/badge/edition-2024-blue">
-    <a href="https://crates.io/crates/agent-usage"><img alt="crates.io" src="https://img.shields.io/crates/v/agent-usage.svg"></a>
+    <a href="https://crates.io/crates/tokenleft"><img alt="crates.io" src="https://img.shields.io/crates/v/tokenleft.svg"></a>
   </p>
 
   <p>
@@ -26,21 +26,21 @@
 Requires [Rust](https://rustup.rs) **1.85+** and `~/.cargo/bin` on your `PATH`.
 
 ```bash
-cargo install agent-usage
+cargo install tokenleft
 ```
 
 Verify:
 
 ```bash
-agent-usage --help
+tokenleft --help
 ```
 
 <details>
 <summary><strong>Build from source</strong> — for development or unreleased changes</summary>
 
 ```bash
-git clone https://github.com/cesarferreira/agent-usage.git
-cd agent-usage
+git clone https://github.com/cesarferreira/tokenleft.git
+cd tokenleft
 cargo install --path . --locked
 # or
 make install-release
@@ -56,7 +56,7 @@ Run without installing:
 
 ```bash
 make build-release
-./target/release/agent-usage
+./target/release/tokenleft
 ```
 
 </details>
@@ -65,19 +65,19 @@ make build-release
 ## Quickstart
 
 ```bash
-agent-usage                    # one-shot bars for Claude, Codex, Cursor
-agent-usage --watch            # refresh every 120s (or --watch 30)
-agent-usage --refresh          # skip the cache
-agent-usage --ttl 60           # cache lifetime in seconds (default 300, 0 = off)
-agent-usage --only claude,cursor
-agent-usage --format summary   # 3 lines: bar, money used, percent used
-agent-usage --format bars      # one compact bar per provider
-agent-usage --format rings     # one line of ◔ ◑ ◕ circles
-agent-usage --format plain     # uncoloured one-liner for status bars
-agent-usage --format json     # machine-readable (--json also works)
+tokenleft                    # one-shot bars for Claude, Codex, Cursor
+tokenleft --watch            # refresh every 120s (or --watch 30)
+tokenleft --refresh          # skip the cache
+tokenleft --ttl 60           # cache lifetime in seconds (default 300, 0 = off)
+tokenleft --only claude,cursor
+tokenleft --format summary   # 3 lines: bar, money used, percent used
+tokenleft --format bars      # one compact bar per provider
+tokenleft --format rings     # one line of ◔ ◑ ◕ circles
+tokenleft --format plain     # uncoloured one-liner for status bars
+tokenleft --format json     # machine-readable (--json also works)
 ```
 
-Results are cached for 5 minutes in `~/Library/Caches/agent-usage/cache.json`, and the last good data is shown if a refresh fails. macOS only. It reads local credentials and calls unofficial endpoints, so it can break without notice:
+Results are cached for 5 minutes in `~/Library/Caches/tokenleft/cache.json`, and the last good data is shown if a refresh fails. macOS only. It reads local credentials and calls unofficial endpoints, so it can break without notice:
 
 | Agent | Credentials | Source |
 | --- | --- | --- |
@@ -91,7 +91,7 @@ Add to `~/.config/rex/init.lua` to open a live usage pane beside the focused one
 
 ```lua
 rex.action{
-  name  = "agent_usage",
+  name  = "tokenleft",
   title = "Agent usage",
   run   = function(ctx)
     rex.session.new_split{
@@ -99,12 +99,12 @@ rex.action{
       ratio     = 0.7,
       layout    = rex.layout.block{
         flavor  = "com.superlogical.terminal.shell",
-        options = { command = { "agent-usage", "--watch" }, exit = { on_completion = false } },
+        options = { command = { "tokenleft", "--watch" }, exit = { on_completion = false } },
       },
     }
   end,
 }
-rex.bind("cmd+shift+u", "agent_usage")
+rex.bind("cmd+shift+u", "tokenleft")
 ```
 
 <a id="development"></a>

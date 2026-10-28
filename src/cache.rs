@@ -38,5 +38,5 @@ impl Cache {
 
 fn path() -> Option<PathBuf> {
     let home = std::env::var_os("HOME")?;
-    Some(PathBuf::from(home).join("Library/Caches/agent-usage/cache.json"))
+    Some(PathBuf::from(home).join("Library/Caches/tokenleft/cache.json"))
 }
