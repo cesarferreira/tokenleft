@@ -161,19 +161,26 @@ tokenleft --watch 300 --format summary          # live, refresh every 5 minutes
 
 ### Rex
 
-Add to `~/.config/rex/init.lua` to open a live usage pane beside the focused one:
+Add to `~/.config/rex/init.lua`. The shortcut opens a 3-line usage strip above the focused pane, and pressing it again closes it:
 
 ```lua
 rex.action{
   name  = "tokenleft",
   title = "Agent usage",
   run   = function(ctx)
+    for _, b in ipairs(rex.session.list_blocks{}.blocks or {}) do
+      if b.label == "tokenleft" then
+        rex.exec({ "rex", "block", "close", "-s", tostring(rex.session_id), b.block_id })
+        return
+      end
+    end
     rex.session.new_split{
-      direction = "horizontal",
-      side      = "after",
-      ratio     = 0.7,
+      direction = "vertical",
+      side      = "before",
+      ratio     = 0.15,
       layout    = rex.layout.block{
         flavor  = "com.superlogical.terminal.shell",
+        label   = "tokenleft",
         options = { command = { "tokenleft", "--watch", "--format", "summary" }, exit = { on_completion = false } },
       },
     }
