@@ -1,0 +1,28 @@
+[package]
+name = "agent-usage"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "Show remaining Claude, Codex and Cursor usage"
+license = "MIT"
+authors = ["Cesar Ferreira"]
+repository = "https://github.com/cesarferreira/agent-usage"
+
+[[bin]]
+name = "agent-usage"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+base64 = "0.22"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+ureq = { version = "2", features = ["json"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
+panic = "abort"
