@@ -161,7 +161,7 @@ tokenleft --watch 300 --format summary          # live, refresh every 5 minutes
 
 ### Rex
 
-Add to `~/.config/rex/init.lua`. The shortcut opens a 3-line usage strip above the focused pane, and pressing it again closes it:
+Add to `~/.config/rex/init.lua`. The shortcut opens a small usage popup centered in the window, and pressing it again closes it:
 
 ```lua
 rex.action{
@@ -174,10 +174,8 @@ rex.action{
         return
       end
     end
-    rex.session.new_split{
-      direction = "vertical",
-      side      = "before",
-      ratio     = 0.15,
+    rex.session.new_layer{
+      bounds = { 0.3, 0.45, 0.4, 0.1 },
       layout    = rex.layout.block{
         flavor  = "com.superlogical.terminal.shell",
         label   = "tokenleft",
