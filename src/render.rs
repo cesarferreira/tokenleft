@@ -79,7 +79,7 @@ fn headline(p: &Provider) -> Option<&Row> {
     let with_pct = || p.rows.iter().filter(|r| r.used_pct.is_some());
     with_pct()
         .find(|r| r.detail.is_some())
-        .or(with_pct().last())
+        .or(with_pct().next_back())
 }
 
 fn pct_of(r: &Row) -> f64 {
