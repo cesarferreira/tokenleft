@@ -147,35 +147,54 @@ fn label(n: &str) -> &'static str {
     }
 }
 
+/// Terminal size in (cols, rows), when stdout is a terminal.
+fn term_size() -> Option<(usize, usize)> {
+    terminal_size::terminal_size().map(|(w, h)| (w.0 as usize, h.0 as usize))
+}
+
+/// Print `out`, centred when asked, and return the terminal size it was laid out for.
+fn draw(cli: &Cli, out: &str) -> Option<(usize, usize)> {
+    if cli.watch.is_some() {
+        print!("\x1b[2J\x1b[H");
+    }
+    let size = term_size();
+    match size {
+        Some((cols, rows)) if cli.center => print!("{}", render::center(out, cols, rows)),
+        _ => print!("{out}"),
+    }
+    let _ = std::io::Write::flush(&mut std::io::stdout());
+    size
+}
+
 fn main() -> Result<()> {
     let cli = Cli::parse();
     loop {
         let now = chrono::Utc::now().timestamp();
         let providers = collect(&cli, now);
         let format = if cli.json { Format::Json } else { cli.format };
+        let mut out = String::new();
+        let mut size = None;
         if format == Format::Json {
             println!("{}", serde_json::to_string_pretty(&providers)?);
         } else {
-            if cli.watch.is_some() {
-                print!("\x1b[2J\x1b[H");
-            }
-            let out = match format {
+            out = match format {
                 Format::Bars => render::compact(&providers),
                 Format::Summary => render::summary(&providers),
                 Format::Rings => render::rings(&providers),
                 Format::Plain => render::plain(&providers),
                 _ => render::render(&providers, now),
             };
-            match terminal_size::terminal_size() {
-                Some((w, h)) if cli.center => {
-                    print!("{}", render::center(&out, w.0 as usize, h.0 as usize))
-                }
-                _ => print!("{out}"),
-            }
+            size = draw(&cli, &out);
         }
-        match cli.watch {
-            Some(secs) => std::thread::sleep(Duration::from_secs(secs.max(10))),
-            None => return Ok(()),
+        let Some(secs) = cli.watch else { return Ok(()) };
+        // Sleep in short steps so a centred view follows the pane when it is resized.
+        let wake = std::time::Instant::now() + Duration::from_secs(secs.max(10));
+        while std::time::Instant::now() < wake {
+            std::thread::sleep(Duration::from_millis(200));
+            let now_size = term_size();
+            if cli.center && format != Format::Json && now_size != size {
+                size = draw(&cli, &out);
+            }
         }
     }
 }
