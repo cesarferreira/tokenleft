@@ -49,6 +49,12 @@ enum Format {
     Table,
     /// One compact line per provider
     Bars,
+    /// Three lines: bar, money or credits used, percent used
+    Summary,
+    /// One line of circle glyphs, like a sidebar ring
+    Rings,
+    /// One uncoloured line, for status bars and scripts
+    Plain,
     /// Machine-readable JSON
     Json,
 }
@@ -151,6 +157,9 @@ fn main() -> Result<()> {
             }
             match format {
                 Format::Bars => print!("{}", render::compact(&providers)),
+                Format::Summary => print!("{}", render::summary(&providers)),
+                Format::Rings => print!("{}", render::rings(&providers)),
+                Format::Plain => print!("{}", render::plain(&providers)),
                 _ => print!("{}", render::render(&providers, now)),
             }
         }

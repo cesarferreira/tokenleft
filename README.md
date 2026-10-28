@@ -70,7 +70,10 @@ agent-usage --watch            # refresh every 120s (or --watch 30)
 agent-usage --refresh          # skip the cache
 agent-usage --ttl 60           # cache lifetime in seconds (default 300, 0 = off)
 agent-usage --only claude,cursor
-agent-usage --format bars      # one compact line per provider
+agent-usage --format summary   # 3 lines: bar, money used, percent used
+agent-usage --format bars      # one compact bar per provider
+agent-usage --format rings     # one line of ◔ ◑ ◕ circles
+agent-usage --format plain     # uncoloured one-liner for status bars
 agent-usage --format json     # machine-readable (--json also works)
 ```
 
