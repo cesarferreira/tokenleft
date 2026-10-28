@@ -90,42 +90,42 @@ Results are cached for 5 minutes in `~/Library/Caches/tokenleft/cache.json`, and
 ```text
 Agent usage
 
-Claude  Enterprise  · updated just now
-  Monthly spend    ━━━━━━──────────────────  $412 / $1,500  ( 27% used)
+Claude  Max  · updated just now
+  Monthly spend    ━━━━━━━━━━──────────────  $84 / $200  ( 42% used)
 
-Codex  ChatGPT Business  · updated just now
-  Monthly credits  ━━━━━━━━━━━━━━──────────  17.2k / 30.0k credits  ( 57% used)  resets in 3d 0h
+Codex  Pro  · updated just now
+  Monthly credits  ━━━━━━━━━━━━━━━━────────  3.4k / 5.0k credits  ( 68% used)  resets in 9d 2h
 
-Cursor  Enterprise  · updated just now
-  Your spend       ────────────────────────  $15.30 / $1,300  (  1% used)  resets in 3d 0h
+Cursor  Pro  · updated just now
+  Your spend       ━━──────────────────────  $1.80 / $20  (  9% used)  resets in 9d 2h
 ```
 
 **`--format summary`** — three lines: bar, money or credits used, percent used:
 
 ```text
-Claude ━━━━━───────────────  $412 / $1,500           27%
-Codex  ━━━━━━━━━━━─────────  17.2k / 30.0k credits   57%
-Cursor ────────────────────  $15.30 / $1,300          1%
+Claude ━━━━━━━━────────────  $84 / $200            42%
+Codex  ━━━━━━━━━━━━━━──────  3.4k / 5.0k credits   68%
+Cursor ━━──────────────────  $1.80 / $20            9%
 ```
 
 **`--format bars`** — one compact bar per provider:
 
 ```text
-Claude ▰▰▰▱▱▱▱▱▱▱  27%
-Codex  ▰▰▰▰▰▰▱▱▱▱  57%
-Cursor ▱▱▱▱▱▱▱▱▱▱   1%
+Claude ▰▰▰▰▱▱▱▱▱▱  42%
+Codex  ▰▰▰▰▰▰▰▱▱▱  68%
+Cursor ▰▱▱▱▱▱▱▱▱▱   9%
 ```
 
 **`--format rings`** — a single line, handy for a narrow pane:
 
 ```text
-Claude ◔ 27%   Codex ◑ 57%   Cursor ○ 1%
+Claude ◑ 42%   Codex ◕ 68%   Cursor ○ 9%
 ```
 
 **`--format plain`** — no colour, for status bars and scripts:
 
 ```text
-Claude 27% · Codex 57% · Cursor 1%
+Claude 42% · Codex 68% · Cursor 9%
 ```
 
 **`--format json`** — for scripts (one provider shown):
@@ -134,17 +134,17 @@ Claude 27% · Codex 57% · Cursor 1%
 [
   {
     "name": "Codex",
-    "plan": "ChatGPT Business",
+    "plan": "Pro",
     "rows": [
       {
         "label": "Monthly credits",
-        "used_pct": 57.0,
-        "detail": "17.2k / 30.0k credits",
-        "resets_at": 1793470487
+        "used_pct": 68.0,
+        "detail": "3.4k / 5.0k credits",
+        "resets_at": 1800000000
       }
     ],
     "error": null,
-    "fetched_at": 1793207687
+    "fetched_at": 1799000000
   }
 ]
 ```
@@ -154,7 +154,7 @@ Bars are blue below 70%, yellow from 70% and red from 90%. The numbers above are
 Use it from a script:
 
 ```bash
-tokenleft --only cursor --format plain          # Cursor 1%
+tokenleft --only cursor --format plain          # Cursor 9%
 tokenleft --json | jq '.[] | select(any(.rows[]; .used_pct > 80)) | .name'
 tokenleft --watch 300 --format summary          # live, refresh every 5 minutes
 ```
