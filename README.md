@@ -174,7 +174,7 @@ rex.action{
       ratio     = 0.7,
       layout    = rex.layout.block{
         flavor  = "com.superlogical.terminal.shell",
-        options = { command = { "tokenleft", "--watch" }, exit = { on_completion = false } },
+        options = { command = { "tokenleft", "--watch", "--format", "summary" }, exit = { on_completion = false } },
       },
     }
   end,
