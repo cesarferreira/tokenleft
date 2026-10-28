@@ -7,6 +7,10 @@ description = "Show remaining Claude, Codex and Cursor usage"
 license = "MIT"
 authors = ["Cesar Ferreira"]
 repository = "https://github.com/cesarferreira/tokenleft"
+readme = "README.md"
+keywords = ["claude", "codex", "cursor", "usage", "cli"]
+categories = ["command-line-utilities"]
+exclude = [".github/", "Makefile", "cliff.toml", "release.toml"]
 
 [[bin]]
 name = "tokenleft"
