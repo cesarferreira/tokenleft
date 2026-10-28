@@ -5,7 +5,7 @@ mod model;
 mod render;
 
 use anyhow::Result;
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use model::Provider;
 use std::time::Duration;
 
@@ -16,8 +16,12 @@ use std::time::Duration;
     about = "Show remaining Claude, Codex and Cursor usage"
 )]
 struct Cli {
-    /// Print machine-readable JSON instead of bars
-    #[arg(long)]
+    /// Output format
+    #[arg(short, long, value_enum, default_value_t = Format::Table)]
+    format: Format,
+
+    /// Shorthand for --format json
+    #[arg(long, conflicts_with = "format")]
     json: bool,
 
     /// Refresh every N seconds (default 120 when given without a value)
@@ -27,6 +31,16 @@ struct Cli {
     /// Only show these providers (claude, codex, cursor)
     #[arg(short, long, value_delimiter = ',')]
     only: Vec<String>,
+}
+
+#[derive(Clone, Copy, Debug, ValueEnum, PartialEq)]
+enum Format {
+    /// Detailed bars with spend and reset times
+    Table,
+    /// One compact line per provider
+    Bars,
+    /// Machine-readable JSON
+    Json,
 }
 
 pub fn claude_title(s: &str) -> String {
@@ -72,13 +86,17 @@ fn main() -> Result<()> {
     loop {
         let providers = collect(&cli.only);
         let now = chrono::Utc::now().timestamp();
-        if cli.json {
+        let format = if cli.json { Format::Json } else { cli.format };
+        if format == Format::Json {
             println!("{}", serde_json::to_string_pretty(&providers)?);
         } else {
             if cli.watch.is_some() {
                 print!("\x1b[2J\x1b[H");
             }
-            print!("{}", render::render(&providers, now));
+            match format {
+                Format::Bars => print!("{}", render::compact(&providers)),
+                _ => print!("{}", render::render(&providers, now)),
+            }
         }
         match cli.watch {
             Some(secs) => std::thread::sleep(Duration::from_secs(secs.max(10))),

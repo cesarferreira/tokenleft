@@ -14,12 +14,18 @@ const WINDOWS: [(&str, &str); 4] = [
 
 pub fn fetch() -> Result<Provider> {
     let (token, plan) = read_token()?;
-    let usage: Value = ureq::get("https://api.anthropic.com/api/oauth/usage")
+    let usage: Value = match ureq::get("https://api.anthropic.com/api/oauth/usage")
         .set("Authorization", &format!("Bearer {token}"))
         .set("anthropic-beta", "oauth-2025-04-20")
         .call()
-        .context("usage request failed (token may be expired; run `claude` once)")?
-        .into_json()?;
+    {
+        Ok(r) => r.into_json()?,
+        Err(ureq::Error::Status(401 | 403, _)) => {
+            bail!("token rejected (run `claude` once to refresh it)")
+        }
+        Err(ureq::Error::Status(429, _)) => bail!("rate limited by Anthropic, try again shortly"),
+        Err(e) => return Err(e).context("usage request failed"),
+    };
 
     let mut rows = Vec::new();
     for (key, label) in WINDOWS {

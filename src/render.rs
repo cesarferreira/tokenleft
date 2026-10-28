@@ -63,3 +63,26 @@ fn until(secs: i64) -> String {
         _ => format!("in {d}d {h}h"),
     }
 }
+
+pub fn compact(providers: &[Provider]) -> String {
+    let mut out = String::new();
+    for p in providers {
+        out.push_str(&format!("{:<7}", p.name));
+        match (&p.error, p.rows.iter().rev().find_map(|r| r.used_pct)) {
+            (Some(_), _) => out.push_str("\x1b[31merror\x1b[0m"),
+            (None, Some(pct)) => {
+                let pct = pct.clamp(0.0, 100.0);
+                let filled = ((pct / 100.0) * 10.0).round() as usize;
+                out.push_str(&format!(
+                    "{}{}\x1b[2m{}\x1b[0m {pct:>3.0}%",
+                    color(pct),
+                    "▰".repeat(filled),
+                    "▱".repeat(10 - filled)
+                ));
+            }
+            (None, None) => out.push_str("\x1b[2mn/a\x1b[0m"),
+        }
+        out.push('\n');
+    }
+    out
+}

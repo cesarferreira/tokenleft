@@ -68,7 +68,8 @@ make build-release
 agent-usage                    # one-shot bars for Claude, Codex, Cursor
 agent-usage --watch            # refresh every 120s (or --watch 30)
 agent-usage --only claude,cursor
-agent-usage --json             # machine-readable
+agent-usage --format bars      # one compact line per provider
+agent-usage --format json     # machine-readable (--json also works)
 ```
 
 macOS only. It reads local credentials and calls unofficial endpoints, so it can break without notice:
