@@ -170,6 +170,7 @@ rex.action{
   run   = function(ctx)
     rex.session.new_split{
       direction = "horizontal",
+      side      = "after",
       ratio     = 0.7,
       layout    = rex.layout.block{
         flavor  = "com.superlogical.terminal.shell",
